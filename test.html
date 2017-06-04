@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+    body{
+      margin: 0;
+      overflow: hidden;
+    }
+    #canvas{
+      background: #111;
+    }
+    </style>
+    <script src='./jquery-3.2.0.js'></script>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+    let ctx = canvas.getContext('2d');
+    function size(){
+      canvas.height = $(window).height();
+      canvas.width = $(window).width();
+    }
+    size();
+    window.onresize = size;
+    main()
+    function main(){
+      let lineList = [];
+      let mosPos = [0, 0];
+      // let xspeed = 0;
+      // let yspeed = 0;
+      let pw = document.documentElement.offsetWidth;
+      let ph = document.documentElement.offsetHeight;
+      let radius = 0
+      document.onmousemove=function(e){
+        mosPos[0]=e.pageX;
+        mosPos[1]=e.pageY;
+        radius = Math.atan((mosPos[0]-pw/2)/mosPos[1])*0.4
+      }
+
+
+      function createLine(){
+        let myline = {
+          speedx: 1,
+          speedy: 20,
+          die: false,
+          posx: Math.floor(Math.random()*pw*1.5),
+          posy: 0,
+          color: '#fff',
+          h: 40
+        };
+        lineList.push(myline);
+      }
+
+      window.requestAnimationFrame(move);
+      function move(){
+        createLine()
+        lineList.forEach((item,index)=>{
+          if(item.die){
+            lineList.splice(index,1)
+          }
+          if(item.posx>pw || item.posy>ph){
+            item.die=true;
+          }
+          item.posy = item.posy+item.speedy
+          item.posx = item.posx+item.speedy*radius
+        })
+        render()
+        window.requestAnimationFrame(move);
+      }
+      function render(){
+        if(radius>0.5){
+          radius = 0.5
+        }else if(radius<-0.5){
+          radius = -0.5
+        }
+        ctx.clearRect(0,0,canvas.width,canvas.height)
+        lineList.forEach((item)=>{
+          if(!item.die){
+            ctx.beginPath();
+            ctx.strokeStyle='#fff';
+            ctx.lineWidth=3;
+            ctx.moveTo(item.posx,item.posy);
+            ctx.lineTo(item.posx+Math.sin(radius)*item.h,item.posy+Math.cos(radius)*item.h);
+            ctx.stroke();
+          }
+        })
+
+      }
+
+    }
+    </script>
+  </body>
+</html>
